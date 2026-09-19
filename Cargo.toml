@@ -3,13 +3,7 @@ name = "spark-hive"
 version = "0.1.0"
 edition = "2024"
 authors = ["AIEN <aien.atlas@proton.me>"]
-description = "Native Sovereign Honeycomb Hive Engine with 2D Axial Hexagonal Geometry and Consumer Model Adapter Pipeline"
-license = "PolyForm-Noncommercial-1.0.0"
-repository = "https://github.com/aien-dev/spark-hive"
-homepage = "https://github.com/aien-dev/spark-hive"
-readme = "README.md"
-keywords = ["agent-hive", "honeycomb", "axial-geometry", "model-adapters", "sovereign-ai"]
-categories = ["asynchronous", "data-structures", "development-tools"]
+description = "Native Sovereign Honeycomb Hive Engine with Hexagonal Axial Geometry"
 
 [dependencies]
 chrono = { version = "0.4.45", features = ["serde"] }
