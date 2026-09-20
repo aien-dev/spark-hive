@@ -52,11 +52,15 @@ mod tests {
             &store,
             "What is the foundational invariant of this sovereign workspace?",
             Some("comb-genesis-00000000"),
-        ).expect("socratic emission");
+        )
+        .expect("socratic emission");
 
         assert_eq!(socratic.role, "socratic");
         assert_eq!(socratic.intent, "branch");
-        assert_eq!(socratic.parent_id, Some("comb-genesis-00000000".to_string()));
+        assert_eq!(
+            socratic.parent_id,
+            Some("comb-genesis-00000000".to_string())
+        );
 
         // 2. Emit subagent completed comb
         let sub = emit_subagent_comb(
@@ -64,7 +68,8 @@ mod tests {
             "researcher",
             "Synthesized hexagonal honeycomb topology specifications.",
             Some(&socratic.id),
-        ).expect("subagent emission");
+        )
+        .expect("subagent emission");
 
         assert_eq!(sub.role, "researcher");
         assert_eq!(sub.intent, "join");

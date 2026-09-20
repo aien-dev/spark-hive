@@ -6,12 +6,12 @@ pub const SQRT_3: f64 = 1.732050807568877293527446341505872367;
 /// 6 Axial Directions:
 /// [1, 0] East, [1, -1] Northeast, [0, -1] Northwest, [-1, 0] West, [-1, 1] Southwest, [0, 1] Southeast
 pub const HEX_DIRECTIONS: [(i32, i32); 6] = [
-    (1, 0),   // East
-    (1, -1),  // Northeast
-    (0, -1),  // Northwest
-    (-1, 0),  // West
-    (-1, 1),  // Southwest
-    (0, 1),   // Southeast
+    (1, 0),  // East
+    (1, -1), // Northeast
+    (0, -1), // Northwest
+    (-1, 0), // West
+    (-1, 1), // Southwest
+    (0, 1),  // Southeast
 ];
 
 pub const HEX_DIRECTION_LABELS: [&str; 6] = [
@@ -163,12 +163,12 @@ mod tests {
     #[test]
     fn test_hex_directions() {
         assert_eq!(HEX_DIRECTIONS.len(), 6);
-        assert_eq!(HEX_DIRECTIONS[0], (1, 0));   // East
-        assert_eq!(HEX_DIRECTIONS[1], (1, -1));  // Northeast
-        assert_eq!(HEX_DIRECTIONS[2], (0, -1));  // Northwest
-        assert_eq!(HEX_DIRECTIONS[3], (-1, 0));  // West
-        assert_eq!(HEX_DIRECTIONS[4], (-1, 1));  // Southwest
-        assert_eq!(HEX_DIRECTIONS[5], (0, 1));   // Southeast
+        assert_eq!(HEX_DIRECTIONS[0], (1, 0)); // East
+        assert_eq!(HEX_DIRECTIONS[1], (1, -1)); // Northeast
+        assert_eq!(HEX_DIRECTIONS[2], (0, -1)); // Northwest
+        assert_eq!(HEX_DIRECTIONS[3], (-1, 0)); // West
+        assert_eq!(HEX_DIRECTIONS[4], (-1, 1)); // Southwest
+        assert_eq!(HEX_DIRECTIONS[5], (0, 1)); // Southeast
     }
 
     #[test]
@@ -177,7 +177,13 @@ mod tests {
         for (q, r) in test_points {
             let (x, y) = axial_to_pixel(q, r, DEFAULT_HEX_RADIUS);
             let back = pixel_to_axial(x, y, DEFAULT_HEX_RADIUS);
-            assert_eq!(back, HexCoord::new(q, r), "Mismatch for point ({}, {})", q, r);
+            assert_eq!(
+                back,
+                HexCoord::new(q, r),
+                "Mismatch for point ({}, {})",
+                q,
+                r
+            );
         }
     }
 
@@ -214,6 +220,9 @@ mod tests {
         assert_eq!(PlacementIntent::parse("join"), PlacementIntent::Join);
         assert_eq!(PlacementIntent::parse("BRANCH"), PlacementIntent::Branch);
         assert_eq!(PlacementIntent::parse("meet"), PlacementIntent::Meet);
-        assert_eq!(PlacementIntent::parse("other"), PlacementIntent::Independent);
+        assert_eq!(
+            PlacementIntent::parse("other"),
+            PlacementIntent::Independent
+        );
     }
 }

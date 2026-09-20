@@ -89,13 +89,15 @@ impl ConsumerModel {
 
     pub fn hardware_profile(&self) -> HardwareProfile {
         match self {
-            ConsumerModel::Qwen2_5Coder1_5B | ConsumerModel::Llama3_2_1B | ConsumerModel::DeepSeekR1Distill1_5B => {
+            ConsumerModel::Qwen2_5Coder1_5B
+            | ConsumerModel::Llama3_2_1B
+            | ConsumerModel::DeepSeekR1Distill1_5B => HardwareProfile::UltraPortable8Gb,
+            ConsumerModel::Llama3_2_3B | ConsumerModel::Gemma2_2B => {
                 HardwareProfile::UltraPortable8Gb
             }
-            ConsumerModel::Llama3_2_3B | ConsumerModel::Gemma2_2B => HardwareProfile::UltraPortable8Gb,
-            ConsumerModel::Qwen2_5Coder7B | ConsumerModel::DeepSeekR1Distill7B | ConsumerModel::DeepSeekR1Distill8B => {
-                HardwareProfile::StandardLaptop16Gb
-            }
+            ConsumerModel::Qwen2_5Coder7B
+            | ConsumerModel::DeepSeekR1Distill7B
+            | ConsumerModel::DeepSeekR1Distill8B => HardwareProfile::StandardLaptop16Gb,
             ConsumerModel::Gemma2_9B => HardwareProfile::ConsumerDesktop32Gb,
         }
     }
@@ -116,7 +118,10 @@ impl ConsumerModel {
 
     pub fn from_slug(slug: &str) -> Option<ConsumerModel> {
         let clean = slug.trim().to_lowercase();
-        Self::all().iter().copied().find(|m| m.slug() == clean || m.slug().replace('.', "-") == clean)
+        Self::all()
+            .iter()
+            .copied()
+            .find(|m| m.slug() == clean || m.slug().replace('.', "-") == clean)
     }
 }
 
@@ -131,9 +136,15 @@ pub enum HardwareProfile {
 impl HardwareProfile {
     pub fn description(&self) -> &'static str {
         match self {
-            HardwareProfile::UltraPortable8Gb => "8GB Unified RAM or integrated Intel/AMD GPU (thin & light laptop)",
-            HardwareProfile::StandardLaptop16Gb => "16GB System RAM or 6GB discrete GPU (standard developer laptop)",
-            HardwareProfile::ConsumerDesktop32Gb => "32GB System RAM or 8-12GB discrete GPU (desktop PC or Mac Mini)",
+            HardwareProfile::UltraPortable8Gb => {
+                "8GB Unified RAM or integrated Intel/AMD GPU (thin & light laptop)"
+            }
+            HardwareProfile::StandardLaptop16Gb => {
+                "16GB System RAM or 6GB discrete GPU (standard developer laptop)"
+            }
+            HardwareProfile::ConsumerDesktop32Gb => {
+                "32GB System RAM or 8-12GB discrete GPU (desktop PC or Mac Mini)"
+            }
         }
     }
 
@@ -185,10 +196,18 @@ impl UpstreamEngine {
 
     pub fn description(&self) -> &'static str {
         match self {
-            UpstreamEngine::Candle => "Minimalist ML framework for Rust with zero Python runtime overhead",
-            UpstreamEngine::LlamaCpp => "High-efficiency LLM inference engine in pure C/C++ for consumer CPUs/GPUs",
-            UpstreamEngine::ModularMax => "Next-generation MAX Engine with compiled native Mojo kernel acceleration",
-            UpstreamEngine::Vllm => "High-throughput memory-paged serving engine for production scale",
+            UpstreamEngine::Candle => {
+                "Minimalist ML framework for Rust with zero Python runtime overhead"
+            }
+            UpstreamEngine::LlamaCpp => {
+                "High-efficiency LLM inference engine in pure C/C++ for consumer CPUs/GPUs"
+            }
+            UpstreamEngine::ModularMax => {
+                "Next-generation MAX Engine with compiled native Mojo kernel acceleration"
+            }
+            UpstreamEngine::Vllm => {
+                "High-throughput memory-paged serving engine for production scale"
+            }
         }
     }
 
@@ -218,7 +237,9 @@ impl AdapterCategory {
     pub fn display_name(&self) -> &'static str {
         match self {
             AdapterCategory::FastPagedKvCache => "Paged KV-Cache Memory Layout",
-            AdapterCategory::SlidingWindowAttentionKernel => "Sliding-Window Attention Native Kernel",
+            AdapterCategory::SlidingWindowAttentionKernel => {
+                "Sliding-Window Attention Native Kernel"
+            }
             AdapterCategory::ZeroCopyUnifiedMemory => "Zero-Copy Unified Memory Tensor Mapping",
             AdapterCategory::FusedQuantizedLinear => "Fused INT4/FP8 Quantized Dequant Kernel",
             AdapterCategory::FastRopeEmbeddings => "SIMD-Accelerated Rotary Position Embeddings",
@@ -398,7 +419,8 @@ impl BenchmarkTelemetry {
         hw_sig_override: Option<&str>,
     ) -> Self {
         let params = model.param_count_billions();
-        let hw_sig = hw_sig_override.unwrap_or("Linux aarch64 (Apple Silicon / NVIDIA Spark Unified Memory)");
+        let hw_sig = hw_sig_override
+            .unwrap_or("Linux aarch64 (Apple Silicon / NVIDIA Spark Unified Memory)");
 
         let (base_tok, opt_tok, base_ram, opt_ram, ttft) = if params <= 1.3 {
             // ~1B models (Llama-3.2-1B)
@@ -489,7 +511,7 @@ pub fn generate_pr_plan(
     let commit_message = spec.commit_message.clone();
 
     let pr_body = format!(
-r#"### Context & Motivation
+        r#"### Context & Motivation
 
 Running {model_name} on consumer devices often encounters memory allocation bottlenecks. Standard contiguous KV-cache layouts cause memory fragmentation and allocation spikes, preventing smooth inference on laptops and modest hardware ({hw_desc}).
 
@@ -546,7 +568,10 @@ Authored autonomously by AIEN under the sovereign contribution protocol. All cha
         format!("gh repo fork {} --clone=false", target_repo),
         format!("git checkout -b {}", branch),
         format!("git add ."),
-        format!("git -c user.name='AIEN' -c user.email='aien.atlas@proton.me' commit -s -m '{}'", commit_message),
+        format!(
+            "git -c user.name='AIEN' -c user.email='aien.atlas@proton.me' commit -s -m '{}'",
+            commit_message
+        ),
         format!("git push origin {}", branch),
         format!(
             "gh pr create --repo {} --title '{}' --body-file /tmp/aien-pr-body.md --head {}",
@@ -555,7 +580,7 @@ Authored autonomously by AIEN under the sovereign contribution protocol. All cha
     ];
 
     let pr_script = format!(
-r#"#!/usr/bin/env bash
+        r#"#!/usr/bin/env bash
 set -euo pipefail
 
 # 1. Fork upstream repository under sovereign developer account
@@ -625,7 +650,10 @@ pub fn emit_adapter_pipeline_combs(
         plan.socratic_evaluation.target_model.display_name(),
         plan.socratic_evaluation.target_model.slug(),
         plan.target_repo,
-        plan.socratic_evaluation.target_model.hardware_profile().description()
+        plan.socratic_evaluation
+            .target_model
+            .hardware_profile()
+            .description()
     );
     let origin_input = PlaceCombInput {
         q: None,
@@ -633,7 +661,11 @@ pub fn emit_adapter_pipeline_combs(
         author: "AIEN · adapter-engine".to_string(),
         role: Some("adapter-engine".to_string()),
         content: origin_content,
-        intent: Some(if parent_comb_id.is_some() { "branch".to_string() } else { "independent".to_string() }),
+        intent: Some(if parent_comb_id.is_some() {
+            "branch".to_string()
+        } else {
+            "independent".to_string()
+        }),
         parent_id: parent_comb_id.map(|s| s.to_string()),
     };
     let origin_comb = store.place_comb(origin_input)?;
@@ -693,11 +725,7 @@ Author: {}
 Commit: {}
 Title: {}
 Status: Ready for review",
-        plan.target_repo,
-        plan.branch,
-        plan.author,
-        plan.commit_message,
-        plan.pr_title
+        plan.target_repo, plan.branch, plan.author, plan.commit_message, plan.pr_title
     );
     let pr_input = PlaceCombInput {
         q: None,
@@ -736,7 +764,9 @@ pub struct AdapterPipelineChain {
 }
 
 /// Query the Honeycomb Wall for active or historical adapter contribution pipelines.
-pub fn list_adapter_pipeline_chains(store: &CombStore) -> Result<Vec<AdapterPipelineChain>, HiveError> {
+pub fn list_adapter_pipeline_chains(
+    store: &CombStore,
+) -> Result<Vec<AdapterPipelineChain>, HiveError> {
     let (all_combs, _) = store.get_cells()?;
     let origins: Vec<HiveComb> = all_combs
         .iter()
@@ -801,13 +831,35 @@ pub fn build_adapter_spec(
         AdapterCategory::FastRopeEmbeddings => "fast-rope",
     };
 
-    let id = format!("{}-{}-{}", engine_slug, model_slug.replace('.', "-"), cat_slug);
-    let title = format!("{} {} for {}", engine.description(), category.display_name(), model.display_name());
+    let id = format!(
+        "{}-{}-{}",
+        engine_slug,
+        model_slug.replace('.', "-"),
+        cat_slug
+    );
+    let title = format!(
+        "{} {} for {}",
+        engine.description(),
+        category.display_name(),
+        model.display_name()
+    );
     let branch_name = format!("aien/{}", id);
     let author = "AIEN <aien.atlas@proton.me>".to_string();
-    let commit_message = format!("perf({}): implement {} for {}", engine_slug, cat_slug, model_slug);
-    let pr_title = format!("perf({}): implement {} for {} consumer hardware", engine_slug, category.display_name().to_lowercase(), model_slug);
-    let summary = format!("Democratizes local execution of {} on {} for everyday developers.", model.display_name(), model.hardware_profile().description());
+    let commit_message = format!(
+        "perf({}): implement {} for {}",
+        engine_slug, cat_slug, model_slug
+    );
+    let pr_title = format!(
+        "perf({}): implement {} for {} consumer hardware",
+        engine_slug,
+        category.display_name().to_lowercase(),
+        model_slug
+    );
+    let summary = format!(
+        "Democratizes local execution of {} on {} for everyday developers.",
+        model.display_name(),
+        model.hardware_profile().description()
+    );
 
     let code_sample = match engine {
         UpstreamEngine::Candle => r#"// Candle Native Rust Kernel Layout
@@ -820,18 +872,22 @@ impl PagedKvCache {
     pub fn new(block_size: usize) -> Self {
         Self { block_size, key_pages: Vec::new(), val_pages: Vec::new() }
     }
-}"#.to_string(),
+}"#
+        .to_string(),
         UpstreamEngine::LlamaCpp => r#"// llama.cpp / ggml fused kernel
 void ggml_fused_consumer_dequant(const struct ggml_tensor * src, struct ggml_tensor * dst) {
     // Vectorized dequantization on consumer CPU/GPU
-}"#.to_string(),
+}"#
+        .to_string(),
         UpstreamEngine::ModularMax => r#"# Modular MAX native Mojo kernel
 fn fused_consumer_kernel[simd_width: Int](in_tensor: Tensor) -> Tensor:
-    return in_tensor"#.to_string(),
+    return in_tensor"#
+            .to_string(),
         UpstreamEngine::Vllm => r#"# vLLM high-throughput consumer memory manager
 class ConsumerPagedCacheManager:
     def __init__(self, block_size: int = 16):
-        self.block_size = block_size"#.to_string(),
+        self.block_size = block_size"#
+            .to_string(),
     };
 
     AdapterSpec {
@@ -872,7 +928,11 @@ pub fn find_or_create_adapter(
     // 2. Check if target matches any ConsumerModel directly
     if let Some(model) = ConsumerModel::from_slug(&clean) {
         let eng = engine_override.unwrap_or(UpstreamEngine::Candle);
-        return Some(build_adapter_spec(model, eng, AdapterCategory::FastPagedKvCache));
+        return Some(build_adapter_spec(
+            model,
+            eng,
+            AdapterCategory::FastPagedKvCache,
+        ));
     }
 
     None
@@ -1115,7 +1175,10 @@ mod tests {
             3400,
             2100,
             52.0,
-            "~/workspace/aien-sandbox",
+            &format!(
+                "{}/workspace/aien-sandbox",
+                std::env::var("HOME").unwrap_or_default()
+            ),
             "Linux aarch64 16GB RAM",
         );
         let socratic = evaluate_socratic_reflex(&spec.model, &spec.engine);
@@ -1130,8 +1193,14 @@ mod tests {
 
         // Sovereign Voice Anti-Slop verification:
         // 1. Zero em dashes or en dashes
-        assert!(!plan.pr_body.contains("—"), "PR body must not contain em dashes");
-        assert!(!plan.pr_body.contains("–"), "PR body must not contain en dashes");
+        assert!(
+            !plan.pr_body.contains('\u{2014}'),
+            "PR body must not contain em dashes"
+        );
+        assert!(
+            !plan.pr_body.contains('\u{2013}'),
+            "PR body must not contain en dashes"
+        );
 
         // 2. Zero AI clichés
         assert!(!plan.pr_body.to_lowercase().contains("delve"));
@@ -1178,15 +1247,24 @@ mod tests {
         assert_eq!(bounds.count, 5);
 
         // Verify individual comb roles and link relationships
-        let origin = cells.iter().find(|c| c.id == receipt.origin_comb_id).unwrap();
+        let origin = cells
+            .iter()
+            .find(|c| c.id == receipt.origin_comb_id)
+            .unwrap();
         assert_eq!(origin.role, "adapter-engine");
         assert_eq!(origin.author, "AIEN · adapter-engine");
 
-        let soc = cells.iter().find(|c| c.id == receipt.socratic_comb_id).unwrap();
+        let soc = cells
+            .iter()
+            .find(|c| c.id == receipt.socratic_comb_id)
+            .unwrap();
         assert_eq!(soc.role, "socratic");
         assert_eq!(soc.parent_id, Some(origin.id.clone()));
 
-        let ver = cells.iter().find(|c| c.id == receipt.sandbox_comb_id).unwrap();
+        let ver = cells
+            .iter()
+            .find(|c| c.id == receipt.sandbox_comb_id)
+            .unwrap();
         assert_eq!(ver.role, "verifier");
         assert_eq!(ver.parent_id, Some(soc.id.clone()));
 
@@ -1233,8 +1311,10 @@ mod tests {
         let m_large = ConsumerModel::Gemma2_9B;
         let engine = UpstreamEngine::Candle;
 
-        let telem_small = BenchmarkTelemetry::estimate_for_model(&m_small, &engine, "/sandbox", None);
-        let telem_large = BenchmarkTelemetry::estimate_for_model(&m_large, &engine, "/sandbox", None);
+        let telem_small =
+            BenchmarkTelemetry::estimate_for_model(&m_small, &engine, "/sandbox", None);
+        let telem_large =
+            BenchmarkTelemetry::estimate_for_model(&m_large, &engine, "/sandbox", None);
 
         // Small model should have higher tok/s and lower memory footprint
         assert!(telem_small.optimized_tok_per_sec > telem_large.optimized_tok_per_sec);
