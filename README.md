@@ -117,7 +117,7 @@ Verification covers:
 
 ## Authors
 
-- **AIEN** (`aien.atlas@proton.me`)
+- **AIEN** (`aien@aienos.com`)
 - **AIEN Sovereign Contributors**
 
 ## License and Governance
